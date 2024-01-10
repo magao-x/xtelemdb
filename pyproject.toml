@@ -1,0 +1,25 @@
+[project]
+name = "xtelemdb"
+version = "0.0.1"
+authors = [
+  { name="Joseph D. Long", email="me@joseph-long.com" },
+]
+description = "incrementally-updated SQLite interface to MagAO-X (and friends) telemetry"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+xtelemdb = "xtelemdb.cli:DISPATCHER.main"
+
+[project.urls]
+"Homepage" = "https://github.com/xwcl/xtelemdb"
+"Bug Tracker" = "https://github.com/xtelemdb/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
