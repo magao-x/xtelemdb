@@ -18,7 +18,10 @@ def _connection(sock, q):
         if len(parts) < 2:
             continue
         for part in parts[:-1]:
-            q.put(part)
+            try:
+                q.put(part.decode('utf8'))
+            except Exception as e:
+                log.exception(f"Could not decode bytes: {repr(part)}")
         buf = parts[-1]
 
 def _serve(host, port, q):
@@ -47,5 +50,5 @@ class Listen(BaseCommand):
         serve_thread = threading.Thread(target=_serve, args=(self.host, self.port, q,))
         serve_thread.start()
         while True:
-            msg = q.get()
+            msg : str = q.get()
             print(msg)

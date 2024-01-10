@@ -69,7 +69,7 @@ def _run_connection_thread(host, port, q):
         except Exception as e:
             log.exception(f"Creating connection to {host}:{port} failed, retrying in {RETRY_CONNECTION_WAIT_SEC}")
             time.sleep(RETRY_CONNECTION_WAIT_SEC)
-            
+
 @xconf.config
 class Watch(BaseCommand):
     '''Keep an eye on the X files and relay messages to the listen process
@@ -94,6 +94,8 @@ class Watch(BaseCommand):
 
         with proclist.open() as fh:
             for line in fh:
+                if not line.strip():
+                    continue
                 if line.strip()[0] == '#':
                     continue
                 parts = line.split(None, 1)
