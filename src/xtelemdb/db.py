@@ -1,27 +1,28 @@
-import sqlite3
+import os
 import typing
 import atexit
 import xconf
 import logging
+import psycopg2
 
 log = logging.getLogger(__name__)
 
 _exit_handler_installed = set()
 
 @xconf.config
-class SqliteConfig(xconf.FileConfig):
-    def connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.path)
-        conn.row_factory = sqlite3.Row
+class DbConfig:
+    host : str = xconf.field(default='localhost', help='Hostname on which PostgreSQL is listening for connections')
+    user : str = xconf.field(default='xsup', help='Username with access to PostgreSQL database over TCP')
+    port : int = xconf.field(default=5432, help='TCP port to connect to PostgreSQL on')
+    database : int = xconf.field(default='xtelem', help='Name of PostgreSQL database')
 
-        # ensure the optimize hook runs once per connected path
-        if self.path not in _exit_handler_installed:
-            def _exit_handler():
-                conn.cursor().execute("PRAGMA OPTIMIZE;")
-                conn.close()
-            atexit.register(_exit_handler)
-            _exit_handler_installed.add(self.path)
-        return conn
-
-    def cursor(self) -> sqlite3.Cursor:
-        return self.connect().cursor()
+    def connect(self):
+        password = os.environ.get('XTELEMDB_PASSWORD', None)
+        if password is None:
+            raise RuntimeError(f"Need password to connect to host={self.host} database={self.database} user={self.user}, set $XTELEMDB_PASSWORD in the environment")
+        return psycopg2.connect(
+            database=self.database,
+            host=self.host,
+            user=self.user,
+            password=password,
+        )

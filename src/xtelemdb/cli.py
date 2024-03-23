@@ -2,8 +2,12 @@ import logging
 import xconf
 import coloredlogs
 from .commands import (
+    ingest,
+    inventory,
+    replicate,
+    verify,
     watch,
-    listen,
+    watch_files,
 )
 
 # Split out for use in worker startup if needed
@@ -25,6 +29,10 @@ class Dispatcher(xconf.Dispatcher):
         _configure_logging(level, self.first_party_loggers)
 
 DISPATCHER = Dispatcher([
+    ingest.Ingest,
+    replicate.Replicate,
+    inventory.Inventory,
+    verify.Verify,
     watch.Watch,
-    listen.Listen,
+    watch_files.WatchFiles,
 ])

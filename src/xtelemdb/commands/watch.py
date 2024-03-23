@@ -15,13 +15,9 @@ import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import logging
-sys.path.append("/opt/MagAOX/source/xtelemdb/src/xtelemdb/commands/")
-#sys.path.append("/home/tsnedden/.conda/envs/sql/lib/python3.12/")
 import psycopg2
-from sqlMain import data_input
+from .sqlMain import data_input
 log = logging.getLogger(__name__)
-
-
 
 class NewXFilesHandler(FileSystemEventHandler):
     def __init__(self, events_queue):
@@ -66,29 +62,7 @@ def _run_logdump_thread(logdump_args, name, message_queue):
         log.debug(f"{outbound_line=}")
         message_queue.put(outbound_line)
  
- #commenting out but keeping in case for now
-# def _run_connection_thread(host, port, q):   ###add outside commands to feed to db instead of listen
-#     print(f"{host=} {port=}")
-#     while True:
-#         sock = socket.create_connection((host, port), timeout=CREATE_CONNECTION_TIMEOUT_SEC)
-#         log.info(f"Connected to {host}:{port}")
-#         try:
-#             with sock:
-#                 while line := q.get():
-#                     sock.send(line)
-#         except Exception as e:
-#             log.exception(f"Creating connection to {host}:{port} failed, retrying in {RETRY_CONNECTION_WAIT_SEC}")
-#             time.sleep(RETRY_CONNECTION_WAIT_SEC)
-
-
 def _run_connection_thread(host, port, q):   ###add outside commands to feed to db instead of listen
-    db_params = {
-        "host": "localhost",
-        "dbname": "xtelem",
-        "user": "tsnedden", 
-        "port": "5432",
-    }
-
     print(f"{host=} {port=}")
     while True:
         log.info(f"Connected to {host}:{port}")
@@ -105,22 +79,16 @@ def _run_connection_thread(host, port, q):   ###add outside commands to feed to 
             log.exception(f"Creating connection to {host}:{port} failed, retrying in {RETRY_CONNECTION_WAIT_SEC}")
             time.sleep(RETRY_CONNECTION_WAIT_SEC)
 
-
 @xconf.config
 class Watch(BaseCommand):
-    '''Keep an eye on the X files and relay messages to the listen process
+    '''Keep an eye on the X files and insert to a database
     '''
-    host : str = xconf.field(default="localhost", help="Hostname or IP to stream to")
-    port : int = xconf.field(default=60100, help="Port to stream to")
     proclist : str = xconf.field(default="/opt/MagAOX/config/proclist_%s.txt", help="Path to process list file, %s will be replaced with the value of $MAGAOX_ROLE (or an empty string if absent from the environment)")
     logdump_exe : str = xconf.field(default="/opt/MagAOX/bin/logdump", help="logdump (a.k.a. teldump) executable to use")
-    watch_dirs : list[str] = xconf.field(default_factory=lambda: [
-        '/data/logs',
-        '/data/rawimages',
-        '/data/telem',
-    ])
 
     def main(self):
+        self.con = self.db.connect()
+
         role = os.environ.get('MAGAOX_ROLE', '')
         proclist = pathlib.Path(self.proclist.replace('%s', role))
         if not proclist.exists():
@@ -157,7 +125,6 @@ class Watch(BaseCommand):
         for dirpath in self.watch_dirs:
             observer.schedule(event_handler, dirpath, recursive=True)
             log.info(f"Watching {dirpath} for changes")
-        # observer.start()
         all_threads.append(observer)
 
         try:

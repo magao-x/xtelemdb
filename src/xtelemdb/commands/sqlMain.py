@@ -6,7 +6,7 @@ import psycopg2
 from psycopg2 import sql
 import json
 import os
-import JSONB_tables as jt
+from . import JSONB_tables as jt
 import logging
 import logging.handlers
 import threading
