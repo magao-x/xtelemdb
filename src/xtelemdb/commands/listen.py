@@ -6,6 +6,7 @@ from queue import Queue
 from ._base import BaseCommand
 from datetime import timezone
 import logging
+
 log = logging.getLogger(__name__)
 
 RETRY_CONNECTION_WAIT_SEC = 2
@@ -27,13 +28,13 @@ def _connection(sock, q):
 def _serve(host, port, q):
     while True:
         try:
-            log.info(f"Listening for connections on {host}:{port}")
-            sock = socket.create_server((host, port), reuse_port=True)
-            while True:
-                new_sock, addrinfo = sock.accept()
-                log.info(f"New connection from {addrinfo}")
-                t = threading.Thread(target=_connection, args=(new_sock, q), daemon=True)
-                t.start()
+            with socket.create_server((host, port), reuse_port=True) as sock:
+                log.info(f"Listening for connections on {host}:{port}")
+                while True:
+                    new_sock, addrinfo = sock.accept()
+                    log.info(f"New connection from {addrinfo}")
+                    t = threading.Thread(target=_connection, args=(new_sock, q), daemon=True)
+                    t.start()
         except Exception as e:
             log.exception(f"Could not accept connections on {host}:{port}, retrying in {RETRY_CONNECTION_WAIT_SEC} sec")
             time.sleep(RETRY_CONNECTION_WAIT_SEC)
@@ -52,3 +53,5 @@ class Listen(BaseCommand):
         while True:
             msg : str = q.get()
             print(msg)
+            #return msg
+

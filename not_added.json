@@ -1,0 +1,10 @@
+{'device': 'filesystem', 'ts': '2024-03-20T05:56:59000', 'ec': 'file_modified', 'msg': {'file': 'maggieo_x_2024-03-20T054658.log', 'size_bytes': 4073749, 'mtime': '2024-03-20T05:56:58.996463000'}}
+
+{'device': 'filesystem', 'ts': '2024-03-20T10:44:31000', 'ec': 'file_modified', 'msg': {'file': 'observers_20240319220230874735995.bintel', 'size_bytes': 422924, 'mtime': '2024-03-20T10:44:30.995788000'}}
+
+{'device': 'filesystem', 'ts': '2024-03-20T12:45:27000', 'ec': 'file_modified', 'msg': {'file': 'maggieo_x_2024-03-20T081910.log', 'size_bytes': 106716443, 'mtime': '2024-03-20T12:45:26.997772000'}}
+
+{'device': 'filesystem', 'ts': '2024-03-21T06:33:23000', 'ec': 'file_modified', 'msg': {'file': 'isAOC_20240321025141116149000.binlog', 'size_bytes': 2137728, 'mtime': '2024-03-21T06:33:22.998213000'}}
+
+{'device': 'filesystem', 'ts': '2024-03-21T08:29:14.559973000', 'ec': 'file_modified', 'msg': {'file': 'tcsi_20240321000344227064912.bintel', 'size_bytes': 8852432, 'mtime': '2024-03-21T08:29:14.555803000'}}
+{'device': 'filesystem', 'ts': '2024-03-22T03:10:40000', 'ec': 'file_modified', 'msg': {'file': 'maggieo_x_2024-03-21T072702.log', 'size_bytes': 486583266, 'mtime': '2024-03-22T03:10:39.996997000'}}
